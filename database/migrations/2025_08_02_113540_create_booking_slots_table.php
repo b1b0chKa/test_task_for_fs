@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('booking_slots', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('api_token', 80)->unique()->nullable();
+            $table->foreignId('booking_id')
+                ->constrained()
+                ->onDelete('cascade');
+            $table->datetime('start_time');
+            $table->datetime('end_time');
             $table->timestamps();
+            $table->index(['start_time', 'end_time']);
         });
     }
 
@@ -24,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('booking_slots');
     }
 };
