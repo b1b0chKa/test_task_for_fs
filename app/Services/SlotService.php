@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\BookingSlot;
+use App\Models\BookingSlots;
 
 class SlotService
 {
@@ -16,7 +16,7 @@ class SlotService
 	 */
 	public function hasOverlap(string $start, string $end, ?int $excludeSlotId = null): bool
 	{
-		return BookingSlot::where(function ($query) use ($start, $end) {
+		return BookingSlots::where(function ($query) use ($start, $end) {
 				$query->whereBetween('start_time', [$start, $end])
 					->orWhereBetween('end_time', [$start, $end]);
 			})

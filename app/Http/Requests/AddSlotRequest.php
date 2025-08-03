@@ -11,7 +11,7 @@ class AddSlotRequest extends FormRequest
 	 */
 	public function authorize(): bool
 	{
-		return false;
+		return true;
 	}
 
 	/**
@@ -25,19 +25,6 @@ class AddSlotRequest extends FormRequest
 			'slot'            => 'required|array',
 			'slot.start_time' => 'required|date',
 			'slot.end_time'   => 'required|date|after:slot.start_time',
-		];
-	}
-
-	public function message()
-	{
-		return [
-			'slot.requried'              => 'Укажите хотя бы один временной слот',
-			'slot.array'                 => 'Поле slot должно быть массивом',
-			'slot.*.start_time.required' => 'Должно быть указано время начала слота',
-			'slot.*.start_time.date'     => 'Поле должно быть корректной даты',
-			'slot.*.end_time.required'   => 'Должно быть указано время окончания слота',
-			'slot.*.end_time.date'       => 'Поле должно быть корректной даты',
-			'slot.*.end_time.after'      => 'Время окончания слота должно быть позже времени начала',
 		];
 	}
 }

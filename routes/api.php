@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\BookingController;
 
 /*
@@ -20,8 +19,8 @@ Route::middleware('auth.token')->group(function ()
 	{
 		Route::get('/bookings', [BookingController::class, 'index']);
 		Route::post('/bookings', [BookingController::class, 'store']);
-		Route::post('/bookings/{booking}/slots', [BookingController::class, 'addSlot']);
-		Route::patch('/bookings/{booking}/slots/{slot}', [BookingController::class, 'updateSlot']);
-		Route::delete('/bookings/{booking}', [BookingController::class, 'destroy']);
+		Route::post('/bookings/{bookingId}/slots', [BookingController::class, 'addSlot']);
+		Route::patch('/bookings/{bookingId}/slots/{slotId}', [BookingController::class, 'updateSlot']);
+		Route::delete('/bookings/{bookingId}', [BookingController::class, 'destroy']);
 	}
 );

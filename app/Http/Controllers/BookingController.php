@@ -10,12 +10,13 @@ use App\Models\Bookings;
 use App\Models\BookingSlots;
 use App\Services\SlotService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
-	public function index(): JsonResponse
+	public function index()
 	{
-		$bookings = Booking::where('user_id', Auth::id())
+		$bookings = Bookings::where('user_id', Auth::id())
 			->with('slots')
 			->latest()
 			->get();
@@ -25,27 +26,27 @@ class BookingController extends Controller
 
 	public function store(StoreBookingRequest $request, SlotService $slotService) 
 	{
-		$booking = Auth::user()->bookings()->create();
 
 		foreach ($request->slots as $slot)
 		{
-			if ($slotService->hasOverlap($slot['start_time'], $slot['end_time'])) {
+			if ($slotService->hasOverlap($slot['start_time'], $slot['end_time']))
+			{
 				return response()->json([
 					'message' => "Слот {$slot['start_time']} - {$slot['end_time']} уже занят."
 				], 422);
 			}
-
+			$booking = Auth::user()->bookings()->create();
 			$booking->slots()->create($slot);
 		}
 
 		return response()->json(new BookingResource($booking), 201);
 	}
 
-	public function addSlot(AddSlotRequest $request, stirng $booking, SlotService $slotService)
+	public function addSlot(AddSlotRequest $request, string $bookingId, SlotService $slotService)
 	{
-		$booking = Bookings::find($booking);
+		$booking = Bookings::find($bookingId);
 
-		if (!$booking && $booking->user_id !== Auth::id())
+		if (!$booking || $booking->user_id !== Auth::id())
 			return response()->json(['message' => 'Бронирование не найдено'], 404);
 
 		$slotData = $request->slot;
@@ -61,16 +62,16 @@ class BookingController extends Controller
 		);
 	}
 
-	public function updateSlot(UpdateSlotRequest $request, string $booking, string $slot, SlotService $slotService)
+	public function updateSlot(UpdateSlotRequest $request, string $bookingId, string $slotId, SlotService $slotService)
 	{
-		$booking = Bookings::find($booking);
+		$booking = Bookings::find($bookingId);
 
-		if (!$booking && $booking->user_id !== Auth::id())
+		if (!$booking || $booking->user_id !== Auth::id())
 			return response()->json(['message' => 'Бронирование не найдено'], 404);
 
-		$slot = BookingSlots::find($slot);
+		$slot = BookingSlots::find($slotId);
 
-		if (! $slot)
+		if (!$slot)
 			return response()->json(['message' => 'Слот не найден'], 404);
 
 		if ($slot->booking_id !== $booking->id)
@@ -89,11 +90,11 @@ class BookingController extends Controller
 		);
 	}
 
-	public function destroy(string $booking): JsonResponse
+	public function destroy(string $bookingId)
 	{
-		$booking = Booking::find($booking);
+		$booking = Bookings::find($bookingId);
 
-		if (! $booking && $booking->user_id !== Auth::id())
+		if (!$booking || $booking->user_id !== Auth::id())
 			return response()->json(['message' => 'Бронирование не найдено'], 404);
 
 		$booking->delete();

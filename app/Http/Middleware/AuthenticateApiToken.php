@@ -6,7 +6,7 @@ use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Fasades\Auth;
+use Illuminate\Support\Facades\Auth;
 
 class AuthenticateApiToken
 {
@@ -26,7 +26,7 @@ class AuthenticateApiToken
 			], 401);
 		}
 
-		$user = App\Models\User::where('api_token', $token)->first();
+		$user = User::where('api_token', $token)->first();
 
 		if(!$user)
 		{
@@ -36,7 +36,6 @@ class AuthenticateApiToken
 		}
 
 		Auth::setUser($user);
-		$request->setUser('user', $user);
 
 		return $next($request);
 	}
