@@ -26,7 +26,6 @@ class BookingController extends Controller
 
 	public function store(StoreBookingRequest $request, SlotService $slotService) 
 	{
-
 		foreach ($request->slots as $slot)
 		{
 			if ($slotService->hasOverlap($slot['start_time'], $slot['end_time']))
@@ -35,9 +34,11 @@ class BookingController extends Controller
 					'message' => "Слот {$slot['start_time']} - {$slot['end_time']} уже занят."
 				], 422);
 			}
-			$booking = Auth::user()->bookings()->create();
-			$booking->slots()->create($slot);
 		}
+
+		$booking = Auth::user()->bookings()->create();
+		foreach ($request->slots as $slot)
+			$booking->slots()->create($slot);
 
 		return response()->json(new BookingResource($booking), 201);
 	}
